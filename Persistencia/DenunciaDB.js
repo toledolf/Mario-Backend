@@ -1,29 +1,32 @@
-import Agendamento from "../Modelo/Agendamento.js";
 import Usuario from "../Modelo/Usuario.js";
 import conectar from "./Conexao.js";
+import Denuncia from "../Modelo/Denuncia.js";
+import Campo from "../Modelo/Campo.js";
 
-export default class AgendamentoDB {
-  async inserirDados(agendamento) {
-    if (agendamento instanceof Agendamento) {
+export default class DenunciaDB {
+  async inserirDados(denuncia) {
+    if (denuncia instanceof Denuncia) {
       const conexao = await conectar();
       if (conexao) {
         const sql =
-          "INSERT INTO agendamento (campo, data, horario, cpfUsuario) \
-                                           VALUES(?, ?, ?, ?)";
+          "INSERT INTO denuncia (data, horario, campoSelecionado, nomeInfrator, dadosDenuncia, cpfUsuario) \
+                                           VALUES(?, ?, ?, ?, ?, ?)";
         const valores = [
-          agendamento.campo,
-          agendamento.data,
-          agendamento.horario,
-          agendamento.cpfUsuario,
+          denuncia.data,
+          denuncia.horario,
+          denuncia.campoSelecionado,
+          denuncia.nomeInfrator,
+          denuncia.dadosDenuncia,
+          denuncia.cpfUsuario,
         ];
         await conexao.query(sql, valores);
       }
 
-     // global.poolConexoes.pool.releaseConnection(conexao);
+      // global.poolConexoes.pool.releaseConnection(conexao);
     }
   }
 
-  async alterarDados(agendamento) {
+  /* async alterarDados(agendamento) {
     if (agendamento instanceof Agendamento) {
       const conexao = await conectar();
       const sql =
@@ -40,9 +43,9 @@ export default class AgendamentoDB {
       await conexao.query(sql, valores);
       //global.poolConexoes.pool.releaseConnection(conexao);
     }
-  }
+  } */
 
-  async excluirDados(agendamento) {
+  /* async excluirDados(agendamento) {
     if (agendamento instanceof Agendamento) {
       const conexao = await conectar();
       const sql = "DELETE FROM agendamento WHERE codigo = ?";
@@ -50,50 +53,55 @@ export default class AgendamentoDB {
       await conexao.query(sql, valores);
       global.poolConexoes.pool.releaseConnection(conexao);
     }
-  }
+  } */
 
   async consultarDados(especificidade) {
     const conexao = await conectar();
     const sql =
-      "SELECT * FROM agendamento as a INNER JOIN usuario as u ON a.cpfUsuario = u.cpf WHERE nome LIKE ?";
+      "SELECT * FROM denuncia as a INNER JOIN usuario as u ON a.cpfUsuario = u.cpf WHERE id LIKE ?";
     const valores = ["%" + especificidade + "%"];
     const [rows] = await conexao.query(sql, valores);
     //global.poolConexoes.pool.releaseConnection(conexao);
 
-    const listaAgendamentos = [];
+    const listaDenuncias = [];
     for (const row of rows) {
+      const campo = new Campo(row["id"]);
       const usuario = new Usuario(row["cpfUsuario"], row["nome"]);
-      const agendamento = new Agendamento(
+      const denuncia = new Denuncia(
         row["id"],
-        row["campo"],
         row["data"],
         row["horario"],
-        row["cpfUsuario"],
-        usuario
+        row["campoSelecionado"],
+        row["nomeInfrator"],
+        row["dadosDenuncia"],
+        usuario,
+        campo
       );
-      listaAgendamentos.push(agendamento);
+      listaDenuncias.push(denuncia);
     }
-    return listaAgendamentos;
+    return listaDenuncias;
   }
 
   async consultarCodigo(id) {
     const conexao = await conectar();
-    const sql = "SELECT * FROM agendamento WHERE id =  ?";
+    const sql = "SELECT * FROM denuncia WHERE id =  ?";
     const valores = [id];
     const [rows] = await conexao.query(sql, valores);
     //global.poolConexoes.pool.releaseConnection(conexao);
 
-    const listaAgendamentos = [];
+    const listaDenuncias = [];
     for (const row of rows) {
-      const agendamento = new Agendamento(
+      const denuncia = new Denuncia(
         row["id"],
-        row["campo"],
         row["data"],
         row["horario"],
+        row["campoSelecionado"],
+        row["nomeInfrator"],
+        row["dadosDenuncia"],
         row["cpfUsuario"]
       );
-      listaAgendamentos.push(agendamento);
+      listaDenuncias.push(denuncia);
     }
-    return listaAgendamentos;
+    return listaDenuncias;
   }
 }
