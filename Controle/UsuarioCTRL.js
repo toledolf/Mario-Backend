@@ -5,6 +5,8 @@ export class UsuarioCTRL {
     if (requisicao.method === "POST") {
       const dados = requisicao.body;
       const cpf = dados.cpf;
+      const senha = dados.senha;
+      const userLevel = dados.userLevel;
       const nome = dados.nome;
       const dataNasc = dados.dataNasc;
       const email = dados.email;
@@ -16,6 +18,8 @@ export class UsuarioCTRL {
       const jogador = dados.jogador;
       if (
         cpf &&
+        senha &&
+        userLevel &&
         nome &&
         dataNasc &&
         email &&
@@ -28,6 +32,8 @@ export class UsuarioCTRL {
       ) {
         const usuario = new Usuario(
           cpf,
+          senha,
+          userLevel,
           nome,
           dataNasc,
           email,
@@ -67,12 +73,53 @@ export class UsuarioCTRL {
     }
   }
 
+  async verificarCredenciais(requisicao, resposta) {
+    resposta.type("application/json");
+    if (requisicao.method === "POST") {
+      const dados = requisicao.body;
+      const cpf = dados.cpf;
+      const senha = dados.senha;
+
+      if (cpf && senha) {
+        try {
+          const usuario = new Usuario(cpf, senha);
+          const existeUsuario = await usuario.verificarCredenciais();
+
+          if (!existeUsuario) {
+            resposta.status(400).json({
+              message: "Erro ao autenticar!",
+              autenticado: false,
+            });
+          }
+
+          resposta.status(200).json({
+            autenticado: true,
+            usuario: existeUsuario,
+            message: "Autenticado com sucesso!",
+          });
+        } catch (erro) {
+          resposta.status(400).json({
+            erro: erro.message,
+            message: "Erro ao autenticar!",
+          });
+        }
+      }
+    } else {
+      resposta.status(400).json({
+        autenticado: false,
+        mensagem: "Método não permitido ou dados JSON não fornecidos!",
+      });
+    }
+  }
+
   atualizar(requisicao, resposta) {
     resposta.type("application/json");
 
     if (requisicao.method === "PUT") {
       const dados = requisicao.body;
       const cpf = dados.cpf;
+      const senha = dados.senha;
+      const userLevel = dados.userLevel;
       const nome = dados.nome;
       const dataNasc = dados.dataNasc;
       const email = dados.email;
@@ -84,6 +131,8 @@ export class UsuarioCTRL {
       const jogador = dados.jogador;
       if (
         cpf &&
+        senha &&
+        userLevel &&
         nome &&
         dataNasc &&
         email &&
@@ -96,6 +145,8 @@ export class UsuarioCTRL {
       ) {
         const usuario = new Usuario(
           cpf,
+          senha,
+          userLevel,
           nome,
           dataNasc,
           email,

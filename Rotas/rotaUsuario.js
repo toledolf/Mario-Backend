@@ -6,6 +6,7 @@ const usuarioCTRL = new UsuarioCTRL();
 
 rotaUsuario
   .post("/", usuarioCTRL.gravar)
+  .post("/login", usuarioCTRL.verificarCredenciais)
   .put("/", usuarioCTRL.atualizar)
   .delete("/", usuarioCTRL.excluir)
   .get("/", usuarioCTRL.consultar)

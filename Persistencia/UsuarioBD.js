@@ -5,9 +5,11 @@ export default class UsuarioBD {
     if (usuario instanceof Usuario) {
       const conexao = await conectar();
       const sql =
-        "INSERT INTO usuario (cpf, nome, dataNasc, email, tel, sexo, cidade, uf, treinador, jogador) VALUES (?,?,?,?,?,?,?,?,?,?)";
+        "INSERT INTO usuario (cpf, senha, userLevel, nome, dataNasc, email, tel, sexo, cidade, uf, treinador, jogador) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
       const valores = [
         usuario.cpf,
+        usuario.senha,
+        usuario.userLevel,
         usuario.nome,
         usuario.dataNasc,
         usuario.email,
@@ -23,13 +25,32 @@ export default class UsuarioBD {
     }
   }
 
+  async verificarCredenciais(usuario) {
+    if (usuario instanceof Usuario) {
+      const conexao = await conectar();
+      const sql = "SELECT * FROM usuario WHERE cpf = ? AND senha = ?";
+      const valores = [usuario.cpf, usuario.senha];
+      const [rows] = await conexao.query(sql, valores);
+
+      for (const row of rows) {
+        const usuario = new Usuario(row["cpf"], row["senha"], row["userLevel"]);
+        if (usuario.cpf === row["cpf"] && usuario.senha === row["senha"]) {
+          return true, row["userLevel"];
+        }
+      }
+      return false;
+    }
+  }
+
   async alterar(usuario) {
     if (usuario instanceof Usuario) {
       const conexao = await conectar();
       const sql =
-        "UPDATE usuario SET nome = ?, dataNasc = ?, email = ?, tel = ?, sexo = ?, cidade = ?, uf = ?, treinador = ?, jogador = ? WHERE cpf = ?";
+        "UPDATE usuario SET senha = ?, userLevel = ?, nome = ?, dataNasc = ?, email = ?, tel = ?, sexo = ?, cidade = ?, uf = ?, treinador = ?, jogador = ? WHERE cpf = ?";
       const valores = [
+        usuario.senha,
         usuario.nome,
+        usuario.userLevel,
         usuario.dataNasc,
         usuario.email,
         usuario.tel,
@@ -66,6 +87,8 @@ export default class UsuarioBD {
     for (const row of rows) {
       const usuario = new Usuario(
         row["cpf"],
+        row["senha"],
+        row["userLevel"],
         row["nome"],
         row["dataNasc"],
         row["email"],
@@ -91,6 +114,8 @@ export default class UsuarioBD {
     for (const row of rows) {
       const usuario = new Usuario(
         row["cpf"],
+        row["senha"],
+        row["userLevel"],
         row["nome"],
         row["dataNasc"],
         row["email"],

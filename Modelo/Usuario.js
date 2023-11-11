@@ -1,6 +1,8 @@
 import UsuarioBD from "../Persistencia/UsuarioBD.js";
 export default class Usuario {
   #cpf;
+  #senha;
+  #userLevel;
   #nome;
   #dataNasc;
   #email;
@@ -11,8 +13,23 @@ export default class Usuario {
   #treinador;
   #jogador;
 
-  constructor(cpf, nome, dataNasc, email, tel, sexo, cidade, uf, treinador, jogador) {
+  constructor(
+    cpf,
+    senha,
+    userLevel,
+    nome,
+    dataNasc,
+    email,
+    tel,
+    sexo,
+    cidade,
+    uf,
+    treinador,
+    jogador
+  ) {
     this.cpf = cpf;
+    this.senha = senha;
+    this.userLevel = userLevel;
     this.nome = nome;
     this.dataNasc = dataNasc;
     this.email = email;
@@ -30,6 +47,22 @@ export default class Usuario {
 
   set cpf(novoCpf) {
     this.#cpf = novoCpf;
+  }
+
+  get senha() {
+    return this.#senha;
+  }
+
+  set senha(novaSenha) {
+    this.#senha = novaSenha;
+  }
+
+  get userLevel() {
+    return this.#userLevel;
+  }
+
+  set userLevel(novoUserLevel) {
+    this.#userLevel = novoUserLevel;
   }
   get nome() {
     return this.#nome;
@@ -106,6 +139,8 @@ export default class Usuario {
   toJSON() {
     return {
       cpf: this.#cpf,
+      senha: this.#senha,
+      userLevel: this.#userLevel,
       nome: this.#nome,
       dataNasc: this.#dataNasc,
       email: this.#email,
@@ -121,6 +156,12 @@ export default class Usuario {
   async gravar() {
     const usuarioBD = new UsuarioBD();
     await usuarioBD.incluir(this);
+  }
+
+  async verificarCredenciais() {
+    const usuarioBD = new UsuarioBD();
+    const usuario = await usuarioBD.verificarCredenciais(this);
+    return usuario;
   }
 
   async atualizar() {
