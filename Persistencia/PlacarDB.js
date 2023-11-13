@@ -32,8 +32,8 @@ export default class PlacarDB {
       const placar = new Placar(
         row["id"],
         row["time_id_1"],
-        row["time_id_2"],
         row["resultado_time_id_1"],
+        row["time_id_2"],
         row["resultado_time_id_2"],
         row["data"]
       );
@@ -53,9 +53,9 @@ export default class PlacarDB {
       const placar = new Placar(
         row["id"],
         row["time_id_1"],
-        row["time_id_2"],
         row["resultado_time_id_1"],
-        row["resultado_time_id_2"],
+        row["time_id_2"],
+        row["resultado_time_id_2"], 
         row["data"]
       );
       listaPlacares.push(placar);
