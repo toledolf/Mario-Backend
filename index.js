@@ -22,7 +22,6 @@ app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/agendamento", rotaAgendamento);
-app.use("/usuario", rotaUsuario);
 app.use("/time", rotaTime);
 app.use("/jogador", rotaJogador);
 app.use("/denuncia", rotaDenuncia);
@@ -32,6 +31,7 @@ app.use("/torneios", rotaTorneio);
 app.use("/users", rotaUsers);
 app.use("/placar", rotaPlacar);
 app.use("/treinador", rotaTreinador);
+app.use("/", rotaUsuario);
 
 app.listen(port, host, () => {
   console.log(`API escutando no link: https://${host}/${port}`);

@@ -1,6 +1,6 @@
 import Usuario from "../Modelo/Usuario.js";
 export class UsuarioCTRL {
-  gravar(requisicao, resposta) {
+  async gravar(requisicao, resposta) {
     resposta.type("application/json");
     if (requisicao.method === "POST") {
       const dados = requisicao.body;
@@ -76,39 +76,54 @@ export class UsuarioCTRL {
   async verificarCredenciais(requisicao, resposta) {
     resposta.type("application/json");
     if (requisicao.method === "POST") {
+      const { path } = requisicao;
+
+      if (path === "/usuario") {
+        return this.gravar(requisicao, resposta);
+      }
       const dados = requisicao.body;
-      const cpf = dados.cpf;
+      const usuarioCpf = dados.usuario.cpf;
       const senha = dados.senha;
 
-      if (cpf && senha) {
+      if (usuarioCpf) {
         try {
-          const usuario = new Usuario(cpf, senha);
-          const existeUsuario = await usuario.verificarCredenciais();
+          const usuarioInstance = new Usuario(usuarioCpf, senha);
+          const resultadoAutenticacao = await usuarioInstance.verificarCredenciais();
 
-          if (!existeUsuario) {
+          if (!resultadoAutenticacao.autenticado) {
             resposta.status(400).json({
-              message: "Erro ao autenticar!",
-              autenticado: false,
+              status: 400,
+              error: {
+                autenticado: false,
+                message: "Credenciais inválidas!",
+              },
+            });
+          } else {
+            resposta.status(200).json({
+              status: 200,
+              message: "Autenticado com sucesso!",
+              userLevel: resultadoAutenticacao.userLevel,
+              autenticado: true,
             });
           }
-
-          resposta.status(200).json({
-            autenticado: true,
-            usuario: existeUsuario,
-            message: "Autenticado com sucesso!",
-          });
         } catch (erro) {
           resposta.status(400).json({
-            erro: erro.message,
-            message: "Erro ao autenticar!",
+            status: 400,
+            error: {
+              erro: erro.message,
+              message: "Erro ao autenticar!",
+            },
           });
         }
+      } else {
+        resposta.status(400).json({
+          status: 400,
+          error: {
+            autenticado: false,
+            mensagem: "Método não permitido ou dados JSON não fornecidos!",
+          },
+        });
       }
-    } else {
-      resposta.status(400).json({
-        autenticado: false,
-        mensagem: "Método não permitido ou dados JSON não fornecidos!",
-      });
     }
   }
 

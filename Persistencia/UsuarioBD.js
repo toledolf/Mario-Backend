@@ -21,7 +21,6 @@ export default class UsuarioBD {
         usuario.jogador,
       ];
       await conexao.query(sql, valores);
-      //global.poolConexoes.pool.releaseConnection(conexao);
     }
   }
 
@@ -30,16 +29,33 @@ export default class UsuarioBD {
       const conexao = await conectar();
       const sql = "SELECT * FROM usuario WHERE cpf = ? AND senha = ?";
       const valores = [usuario.cpf, usuario.senha];
-      const [rows] = await conexao.query(sql, valores);
 
-      for (const row of rows) {
-        const usuario = new Usuario(row["cpf"], row["senha"], row["userLevel"]);
-        if (usuario.cpf === row["cpf"] && usuario.senha === row["senha"]) {
-          return true, row["userLevel"];
+      try {
+        const [rows] = await conexao.query(sql, valores);
+
+        if (rows.length > 0) {
+          const row = rows[0];
+          const usuarioEncontrado = new Usuario(
+            row["cpf"],
+            row["senha"],
+            row["userLevel"]
+          );
+
+          if (
+            usuarioEncontrado.cpf === row["cpf"] &&
+            usuarioEncontrado.senha === row["senha"]
+          ) {
+            return { autenticado: true, userLevel: row["userLevel"] };
+          }
         }
+
+        return { autenticado: false };
+      } catch (error) {
+        console.error("Erro ao consultar o banco de dados:", error);
+        return { autenticado: false, error: error.message };
       }
-      return false;
     }
+    return { autenticado: false, error: "Usuário inválido" };
   }
 
   async alterar(usuario) {
@@ -62,7 +78,6 @@ export default class UsuarioBD {
         usuario.cpf,
       ];
       await conexao.query(sql, valores);
-      //global.poolConexoes.pool.releaseConnection(conexao);
     }
   }
 
@@ -72,7 +87,6 @@ export default class UsuarioBD {
       const sql = "DELETE FROM usuario WHERE cpf = ?";
       const valores = [usuario.cpf];
       await conexao.query(sql, valores);
-      //global.poolConexoes.pool.releaseConnection(conexao);
     }
   }
 
@@ -81,7 +95,6 @@ export default class UsuarioBD {
     const sql = "SELECT * FROM usuario WHERE nome LIKE ?";
     const valores = ["%" + termo + "%"];
     const [rows] = await conexao.query(sql, valores);
-    //global.poolConexoes.pool.releaseConnection(conexao);
 
     const listaUsuarios = [];
     for (const row of rows) {
@@ -108,7 +121,6 @@ export default class UsuarioBD {
     const sql = "SELECT * FROM usuario WHERE cpf = ?";
     const valores = [cpf];
     const [rows] = await conexao.query(sql, valores);
-    //global.poolConexoes.pool.releaseConnection(conexao);
 
     const listaUsuarios = [];
     for (const row of rows) {

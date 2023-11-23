@@ -5,11 +5,11 @@ const rotaUsuario = new Router();
 const usuarioCTRL = new UsuarioCTRL();
 
 rotaUsuario
-  .post("/", usuarioCTRL.gravar)
   .post("/login", usuarioCTRL.verificarCredenciais)
+  .post("/usuario", usuarioCTRL.gravar)
   .put("/", usuarioCTRL.atualizar)
   .delete("/", usuarioCTRL.excluir)
-  .get("/", usuarioCTRL.consultar)
+  .get("/usuario", usuarioCTRL.consultar)
   .get("/:cpf", usuarioCTRL.consultarPeloCPF);
 
 export default rotaUsuario;
