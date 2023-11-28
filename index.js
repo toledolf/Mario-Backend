@@ -11,6 +11,7 @@ import rotaJogador from "./Rotas/rotaJogador.js";
 import rotaUsers from "./Rotas/rotaUsers.js";
 import rotaPlacar from "./Rotas/rotaPlacar.js";
 import rotaTreinador from "./Rotas/rotaTreinador.js";
+import rotaRequisicoes from "./Rotas/rotaRequisicoes.js";
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use(cors({ origin: "*" }));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use("/agendamento", rotaAgendamento);
+app.use("/agendamento", rotaAgendamento); 
 app.use("/time", rotaTime);
 app.use("/jogador", rotaJogador);
 app.use("/denuncia", rotaDenuncia);
@@ -31,6 +32,7 @@ app.use("/torneios", rotaTorneio);
 app.use("/users", rotaUsers);
 app.use("/placar", rotaPlacar);
 app.use("/treinador", rotaTreinador);
+app.use("/requisicao", rotaRequisicoes);
 app.use("/", rotaUsuario);
 
 app.listen(port, host, () => {
