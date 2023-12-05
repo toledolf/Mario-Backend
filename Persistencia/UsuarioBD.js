@@ -45,7 +45,7 @@ export default class UsuarioBD {
             usuarioEncontrado.cpf === row["cpf"] &&
             usuarioEncontrado.senha === row["senha"]
           ) {
-            return { autenticado: true, userLevel: row["userLevel"] };
+            return { autenticado: true, userLevel: row["userLevel"], cpf: row["cpf"] };
           }
         }
 

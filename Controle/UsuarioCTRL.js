@@ -103,6 +103,7 @@ export class UsuarioCTRL {
               status: 200,
               message: "Autenticado com sucesso!",
               userLevel: resultadoAutenticacao.userLevel,
+              cpf: resultadoAutenticacao.cpf,
               autenticado: true,
             });
           }
